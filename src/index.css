@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ide-bg: var(--ide-bg);
+  --color-ide-sidebar: var(--ide-sidebar);
+  --color-ide-activitybar: var(--ide-activitybar);
+  --color-ide-statusbar: var(--ide-statusbar);
+  --color-ide-header: var(--ide-header);
+  --color-ide-border: var(--ide-border);
+  --color-ide-active: var(--ide-active);
+  --color-ide-hover: var(--ide-hover);
+  --color-ide-text: var(--ide-text);
+  --color-ide-text-bright: var(--ide-text-bright);
+  --color-ide-accent: var(--ide-accent);
+  --color-ide-tab-inactive: var(--ide-tab-inactive);
+  --color-ide-tab-active: var(--ide-tab-active);
+}
+
+@layer base {
+  :root {
+    /* VS Code Dark (Default) */
+    --ide-bg: #1e1e1e;
+    --ide-sidebar: #252526;
+    --ide-activitybar: #333333;
+    --ide-statusbar: #007acc;
+    --ide-header: #2d2d2d;
+    --ide-border: #333333;
+    --ide-active: #37373d;
+    --ide-hover: #2a2d2e;
+    --ide-text: #cccccc;
+    --ide-text-bright: #ffffff;
+    --ide-accent: #007acc;
+    --ide-tab-inactive: #2d2d2d;
+    --ide-tab-active: #1e1e1e;
+  }
+
+  .theme-github-light {
+    --ide-bg: #ffffff;
+    --ide-sidebar: #f6f8fa;
+    --ide-activitybar: #24292e;
+    --ide-statusbar: #24292e;
+    --ide-header: #f6f8fa;
+    --ide-border: #e1e4e8;
+    --ide-active: #e1e4e8;
+    --ide-hover: #f1f8ff;
+    --ide-text: #24292e;
+    --ide-text-bright: #000000;
+    --ide-accent: #0366d6;
+    --ide-tab-inactive: #f6f8fa;
+    --ide-tab-active: #ffffff;
+  }
+
+  .theme-monokai {
+    --ide-bg: #272822;
+    --ide-sidebar: #1e1f1c;
+    --ide-activitybar: #1e1f1c;
+    --ide-statusbar: #1e1f1c;
+    --ide-header: #1e1f1c;
+    --ide-border: #3e3d32;
+    --ide-active: #3e3d32;
+    --ide-hover: #3e3d32;
+    --ide-text: #f8f8f2;
+    --ide-text-bright: #ffffff;
+    --ide-accent: #a6e22e;
+    --ide-tab-inactive: #1e1f1c;
+    --ide-tab-active: #272822;
+  }
+
+  .theme-dracula {
+    --ide-bg: #282a36;
+    --ide-sidebar: #21222c;
+    --ide-activitybar: #191a21;
+    --ide-statusbar: #191a21;
+    --ide-header: #21222c;
+    --ide-border: #44475a;
+    --ide-active: #44475a;
+    --ide-hover: #44475a;
+    --ide-text: #f8f8f2;
+    --ide-text-bright: #ffffff;
+    --ide-accent: #bd93f9;
+    --ide-tab-inactive: #21222c;
+    --ide-tab-active: #282a36;
+  }
+
+  .theme-solarized-dark {
+    --ide-bg: #002b36;
+    --ide-sidebar: #073642;
+    --ide-activitybar: #00212b;
+    --ide-statusbar: #00212b;
+    --ide-header: #073642;
+    --ide-border: #586e75;
+    --ide-active: #073642;
+    --ide-hover: #073642;
+    --ide-text: #839496;
+    --ide-text-bright: #93a1a1;
+    --ide-accent: #268bd2;
+    --ide-tab-inactive: #073642;
+    --ide-tab-active: #002b36;
+  }
+
+  body {
+    @apply bg-ide-bg text-ide-text selection:bg-ide-accent/30 transition-colors duration-300;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #424242;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4f4f4f;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+}

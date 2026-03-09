@@ -1,0 +1,5 @@
+{
+  "name": "Mobile Web IDE",
+  "description": "A production-ready, mobile-friendly Web IDE with backend file management and code execution.",
+  "requestFramePermissions": []
+}
