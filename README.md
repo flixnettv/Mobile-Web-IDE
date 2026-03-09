@@ -1,67 +1,65 @@
-# Mobile Web IDE
+# 📱 Mobile Web IDE
 
-A production-ready, mobile-friendly Web IDE with a built-in backend for file management and code execution.
+A production-ready, mobile-friendly Web IDE — VS Code experience in any browser.
 
-## Features
+## ✨ Features
 
-- **Monaco Editor**: High-performance code editor with syntax highlighting.
-- **File Explorer**: Create, read, update, and delete files.
-- **Code Execution**: Run JavaScript code directly in the browser.
-- **Mobile Friendly**: Responsive design optimized for phones and tablets.
-- **Android Wrapper**: Native Kotlin wrapper for mobile app deployment.
-- **Docker Support**: Containerized for easy deployment.
+- **Monaco Editor** — Full VS Code editor with syntax highlighting for 30+ languages
+- **File Explorer** — Collapsible tree with create, rename, delete
+- **Code Runner** — Execute JavaScript & Python directly
+- **Terminal** — Interactive shell with command history
+- **Git Integration** — Stage, commit, push, pull, branches, remotes
+- **AI Assistant** — Gemini / OpenAI / Custom endpoint, context-aware
+- **Auth System** — SQLite + bcrypt sessions, protects all APIs
+- **Themes** — VS Dark, GitHub Light, Monokai, Dracula, Solarized, One Dark
+- **Internationalization** — Arabic / English with full RTL support
+- **Auto-Save** — Configurable, saves 1.5s after last keystroke
+- **Docker & Android** — Deploy anywhere
 
-## Project Structure
+## 🚀 Quick Start
 
-- `backend/`: Express server logic (integrated in `server.ts`).
-- `web/`: React/Vite frontend (integrated in `src/`).
-- `android/`: Native Android application source.
-- `docker/`: Dockerfile for containerization.
-- `scripts/`: Build and setup scripts.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-
-### Installation
-
-1. Clone the repository.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Running the App
-
-Start the development server:
 ```bash
+git clone https://github.com/flixnettv/Mobile-Web-IDE
+cd Mobile-Web-IDE
+cp .env.example .env   # fill in SESSION_SECRET at minimum
+npm install
 npm run dev
 ```
-The IDE will be available at `http://localhost:3000`.
+Open `http://localhost:3000` → Register an account → Start coding!
 
-### Docker Deployment
+## 🔒 Security (Production Checklist)
 
-Build and run the Docker container:
+- [ ] Set a strong `SESSION_SECRET` (32+ random bytes)
+- [ ] Set `NODE_ENV=production`
+- [ ] Serve behind HTTPS (nginx/Caddy/Cloudflare)
+- [ ] Add AI API keys to `.env`, never commit them
+- [ ] Review blocked-commands list in `server.ts`
+
+## 🐳 Docker
+
 ```bash
-docker build -t webide -f docker/Dockerfile .
-docker run -p 3000:3000 webide
+docker compose up -d
 ```
 
-### Android Build (via Google Colab)
+## 📱 Android
 
-1. Upload the project to Google Colab.
-2. Run the setup script:
+1. **Emulator:** URL defaults to `http://10.0.2.2:3000`
+2. **Real device:** Edit `MainActivity.kt` → set your server IP
+3. **Build APK via Colab:**
    ```bash
    bash scripts/setup-colab.sh
-   ```
-3. Build the APK:
-   ```bash
    bash scripts/build-apk.sh
    ```
 
-## License
+## ⚙️ Environment Variables
 
+| Variable | Required | Description |
+|---|---|---|
+| `SESSION_SECRET` | ✅ | Random secret for session cookies |
+| `NODE_ENV` | ✅ | `development` or `production` |
+| `GEMINI_API_KEY` | Optional | Google Gemini key |
+| `OPENAI_API_KEY` | Optional | OpenAI key |
+| `GITHUB_CLIENT_ID` | Optional | GitHub OAuth |
+
+## License
 Apache-2.0

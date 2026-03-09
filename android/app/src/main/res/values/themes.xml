@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.WebIDE" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/ide_accent</item>
+        <item name="colorPrimaryVariant">@color/ide_bg</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/ide_bg</item>
+        <item name="android:statusBarColor">@color/ide_bg</item>
+        <item name="android:navigationBarColor">@color/ide_bg</item>
+    </style>
+</resources>
