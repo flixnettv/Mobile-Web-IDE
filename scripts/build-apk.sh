@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # build-apk.sh  —  Build the Android APK locally or in Google Colab
 # ─────────────────────────────────────────────────────────────────────────────
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -18,7 +18,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # ── Detect environment ──────────────────────────────────────────────────────
-if [ -n "$COLAB_GPU" ] || [ -d "/content" ]; then
+if [ -n "${COLAB_GPU:-}" ] || [ -d "/content" ]; then
   ENV="colab"
   echo "🌐 Environment: Google Colab"
 else
@@ -27,7 +27,8 @@ else
 fi
 
 # ── Java ────────────────────────────────────────────────────────────────────
-if ! java -version 2>&1 | grep -q "17\|18\|19\|20\|21"; then
+JAVA_MAJOR="$(java -version 2>&1 | awk -F '[\".]' '/version/ {print $2}')"
+if [ -z "$JAVA_MAJOR" ] || [ "$JAVA_MAJOR" -lt 17 ]; then
   echo "☕ Installing OpenJDK 17..."
   sudo apt-get update -qq
   sudo apt-get install -y openjdk-17-jdk -qq
@@ -36,14 +37,39 @@ export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 echo "☕ Java: $(java -version 2>&1 | head -1)"
 
 # ── Android SDK ──────────────────────────────────────────────────────────────
-if [ -z "$ANDROID_HOME" ] || [ ! -d "$ANDROID_HOME" ]; then
+if [ -z "${ANDROID_HOME:-}" ] || [ ! -d "$ANDROID_HOME" ]; then
   echo "🤖 Installing Android SDK..."
   export ANDROID_HOME="$HOME/android-sdk"
   mkdir -p "$ANDROID_HOME/cmdline-tools"
 
   cd /tmp
-  wget -q "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -O cmdline-tools.zip
-  unzip -q cmdline-tools.zip
+  SDK_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+  SDK_TOOLS_ZIP="${ANDROID_CMDLINE_TOOLS_ZIP:-/tmp/cmdline-tools.zip}"
+
+  if [ ! -f "$SDK_TOOLS_ZIP" ]; then
+    echo "⬇️ Downloading Android command line tools..."
+    if ! wget -q "$SDK_TOOLS_URL" -O "$SDK_TOOLS_ZIP"; then
+      echo "❌ Failed to download Android command line tools from: $SDK_TOOLS_URL"
+      echo "   If your environment blocks direct downloads, pre-download the ZIP and run:"
+      echo "   ANDROID_CMDLINE_TOOLS_ZIP=/path/to/commandlinetools.zip bash scripts/build-apk.sh"
+      exit 1
+    fi
+  else
+    echo "✅ Using pre-downloaded Android tools ZIP: $SDK_TOOLS_ZIP"
+  fi
+
+  if ! unzip -tq "$SDK_TOOLS_ZIP" > /dev/null 2>&1; then
+    echo "⚠️ Existing tools ZIP is invalid. Re-downloading..."
+    if ! wget -q "$SDK_TOOLS_URL" -O "$SDK_TOOLS_ZIP"; then
+      echo "❌ Failed to download a valid Android tools ZIP from: $SDK_TOOLS_URL"
+      exit 1
+    fi
+  fi
+
+  if [ "$SDK_TOOLS_ZIP" != "/tmp/cmdline-tools.zip" ]; then
+    cp "$SDK_TOOLS_ZIP" /tmp/cmdline-tools.zip
+  fi
+  unzip -q /tmp/cmdline-tools.zip
   mv cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
 
   export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
