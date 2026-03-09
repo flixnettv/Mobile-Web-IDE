@@ -28,12 +28,19 @@ fi
 
 # ── Java ────────────────────────────────────────────────────────────────────
 JAVA_MAJOR="$(java -version 2>&1 | awk -F '[\".]' '/version/ {print $2}')"
-if [ -z "$JAVA_MAJOR" ] || [ "$JAVA_MAJOR" -lt 17 ]; then
-  echo "☕ Installing OpenJDK 17..."
-  sudo apt-get update -qq
-  sudo apt-get install -y openjdk-17-jdk -qq
+if [ -z "$JAVA_MAJOR" ] || [ "$JAVA_MAJOR" -lt 17 ] || [ "$JAVA_MAJOR" -gt 21 ]; then
+  if [ -x "/usr/lib/jvm/java-17-openjdk-amd64/bin/java" ]; then
+    echo "☕ Using installed OpenJDK 17 for Android build compatibility..."
+  else
+    echo "☕ Installing OpenJDK 17 (compatible with Android Gradle tooling)..."
+    sudo apt-get update -qq
+    sudo apt-get install -y openjdk-17-jdk -qq
+  fi
+  export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+  export PATH="$JAVA_HOME/bin:$PATH"
+else
+  export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 fi
-export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 echo "☕ Java: $(java -version 2>&1 | head -1)"
 
 # ── Android SDK ──────────────────────────────────────────────────────────────
@@ -69,7 +76,8 @@ if [ -z "${ANDROID_HOME:-}" ] || [ ! -d "$ANDROID_HOME" ]; then
   if [ "$SDK_TOOLS_ZIP" != "/tmp/cmdline-tools.zip" ]; then
     cp "$SDK_TOOLS_ZIP" /tmp/cmdline-tools.zip
   fi
-  unzip -q /tmp/cmdline-tools.zip
+  unzip -q -o /tmp/cmdline-tools.zip
+  rm -rf "$ANDROID_HOME/cmdline-tools/latest"
   mv cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
 
   export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
@@ -82,6 +90,13 @@ else
   export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
   echo "✅ Android SDK found at: $ANDROID_HOME"
 fi
+
+
+# Ensure Android Gradle Plugin can discover SDK path
+LOCAL_PROPERTIES_FILE="$ANDROID_DIR/local.properties"
+printf "sdk.dir=%s
+" "$ANDROID_HOME" > "$LOCAL_PROPERTIES_FILE"
+echo "✅ Wrote SDK path to: $LOCAL_PROPERTIES_FILE"
 
 # ── Gradle ──────────────────────────────────────────────────────────────────
 if ! command -v gradle &> /dev/null && [ ! -f "$ANDROID_DIR/gradlew" ]; then
@@ -117,17 +132,17 @@ echo ""
 echo "🔨 Building Debug APK..."
 if [ -f "gradlew" ]; then
   chmod +x gradlew
-  ./gradlew assembleDebug --no-daemon 2>&1 | tail -20
+  ./gradlew assembleDebug --no-daemon
 else
-  gradle assembleDebug --no-daemon 2>&1 | tail -20
+  gradle assembleDebug --no-daemon
 fi
 
 echo ""
 echo "🚀 Building Release APK..."
 if [ -f "gradlew" ]; then
-  ./gradlew assembleRelease --no-daemon 2>&1 | tail -10
+  ./gradlew assembleRelease --no-daemon
 else
-  gradle assembleRelease --no-daemon 2>&1 | tail -10
+  gradle assembleRelease --no-daemon
 fi
 
 # ── Output ────────────────────────────────────────────────────────────────────
