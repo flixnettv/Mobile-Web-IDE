@@ -1,20 +1,39 @@
 #!/bin/bash
-# ─────────────────────────────────────────────────────────────────────────────
-# setup-colab.sh — Prepare Google Colab environment for APK build
-# Usage in Colab: !bash scripts/setup-colab.sh && bash scripts/build-apk.sh
-# ─────────────────────────────────────────────────────────────────────────────
 
-echo "🌐 Setting up Google Colab for Android APK build..."
+echo "Setting up Google Colab environment for WebIDE build..."
 
-# Upload your project ZIP to Colab first, then run:
-# !unzip Mobile-Web-IDE-Production.zip
-# !cd ide && bash scripts/setup-colab.sh
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-apt-get update -qq
-apt-get install -y openjdk-17-jdk unzip wget -qq
+# Install OpenJDK 17
+sudo apt-get update
+sudo apt-get install -y openjdk-17-jdk
 
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
+# Install Android SDK
+export ANDROID_HOME=$HOME/android-sdk
+mkdir -p $ANDROID_HOME
+cd $ANDROID_HOME
+wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+unzip commandlinetools-linux-*.zip
+rm commandlinetools-linux-*.zip
+mkdir -p cmdline-tools/latest
+mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null
 
-echo "✅ Colab environment ready. Now run:"
-echo "   bash scripts/build-apk.sh"
+# Set PATH
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+# Accept licenses
+yes | sdkmanager --licenses
+
+# Install build tools and platform
+sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+# Install Gradle
+wget https://services.gradle.org/distributions/gradle-8.1.1-bin.zip
+sudo mkdir -p /opt/gradle
+sudo unzip -d /opt/gradle gradle-8.1.1-bin.zip
+rm gradle-8.1.1-bin.zip
+export PATH=$PATH:/opt/gradle/gradle-8.1.1/bin
+
+echo "Setup complete. You can now run scripts/build-apk.sh"
